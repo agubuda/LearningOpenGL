@@ -137,18 +137,26 @@ int main(void)
     GLCall(glGenVertexArrays(1, &vao));
     GLCall(glBindVertexArray(vao));
 
-    unsigned int buffer;
-    glGenBuffers(1, &buffer);
+    VertexArray va;
+    VertexBuffer vb(positions, 4 * 2 * sizeof(float));
+    //unsigned int buffer;
+    /*glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * 2, positions, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * 2, positions, GL_STATIC_DRAW);*/
+    va.AddBuffer(vb);
+
+    BufferLayout layout;
+    layout.Push<float>(3);
+    va.AddLayout(layout);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
-    unsigned int ibo;
-    glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6  *sizeof(unsigned int), indices, GL_STATIC_DRAW);
+    IndexBuffer ib(indices, 6);
+    //unsigned int ibo;
+    //glGenBuffers(1, &ibo);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6  *sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
     ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
 
@@ -181,11 +189,13 @@ int main(void)
         //glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
         
         glBindVertexArray(vao);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+        va.Bind();
+        ib.Bind();
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
-        GLClearError();
+        //GLClearError();
 
-        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+        GLCall(glDrawElements (GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
         if (r > 1.0f)
             increment = -0.05f;

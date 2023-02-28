@@ -12,6 +12,7 @@
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
 #include "Shader.h"
+#include "Texture.h"
 
 
 int main(void)
@@ -45,10 +46,10 @@ int main(void)
     std::cout << glGetString(GL_VERSION) << std::endl;
 
     float positions[] = {
-        -0.5f, -0.5f,
-         0.5f, -0.5f,
-         0.5f,  0.5f,
-        -0.5f,  0.5f
+        -0.5f, -0.5f, 0.0f,0.0f,
+         0.5f, -0.5f, 1.0f, 0.0f,
+         0.5f,  0.5f, 1.0f, 1.0f,
+        -0.5f,  0.5f, 0.0f, 1.0f
     };
 
     unsigned int indices[] = {
@@ -61,7 +62,7 @@ int main(void)
     GLCall(glBindVertexArray(vao));
 
     VertexArray va;
-    VertexBuffer vb(positions, 4 * 2 * sizeof(float));
+    VertexBuffer vb(positions, 4 * 4 * sizeof(float));
     //unsigned int buffer;
     /*glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -69,6 +70,7 @@ int main(void)
     //va.AddBuffer(vb);
 
     VertexBufferLayout layout;
+    layout.Push<float>(2);
     layout.Push<float>(2);
     va.AddBuffer(vb, layout);
      
@@ -82,10 +84,16 @@ int main(void)
     shader.Bind();
     shader.SetUniform4f("u_Color", 1.0f, 0.3f, 0.8f, 1.0f);
     
+    Texture texture("res/textures/1.png");
+    texture.Bind();
+    shader.SetUniform1i("u_Texture",0);
+
     va.Unbind();
     vb.Unbind();
     ib.Unbind();
     shader.Unbind();
+
+    Renderer renderer;
     //GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
     //GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
     //glUseProgram(0);
@@ -99,23 +107,12 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
+        renderer.Clear();
 
         shader.Bind();
         shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
 
-        //glBindBuffer(GL_ARRAY_BUFFER, buffer);
-        //glEnableVertexAttribArray(0);
-        //glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
-        
-        //glBindVertexArray(vao);
-        va.Bind();
-        ib.Bind();
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-
-        //GLClearError();
-
-        GLCall(glDrawElements (GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+        renderer.Draw(va, ib, shader);
 
         if (r > 1.0f)
             increment = -0.05f;

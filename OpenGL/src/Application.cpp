@@ -57,9 +57,12 @@ int main(void)
         2,3,0
     };
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     unsigned int vao;
-    GLCall(glGenVertexArrays(1, &vao));
-    GLCall(glBindVertexArray(vao));
+    //GLCall(glGenVertexArrays(1, &vao));
+    //GLCall(glBindVertexArray(vao));
 
     VertexArray va;
     VertexBuffer vb(positions, 4 * 4 * sizeof(float));
